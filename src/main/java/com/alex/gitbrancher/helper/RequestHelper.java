@@ -108,6 +108,6 @@ public class RequestHelper {
 	}
 
 	public String getToken() {
-		return "7bfd0ea5d82d37bce2e054a282a5a6ebe77c6378";
+		return "someTokenHere";
 	}
 }
