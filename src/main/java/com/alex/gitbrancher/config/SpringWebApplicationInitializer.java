@@ -11,12 +11,12 @@ import org.springframework.web.servlet.DispatcherServlet;
 public class SpringWebApplicationInitializer implements WebApplicationInitializer {
 
 	@Override
-	public void onStartup(ServletContext container) throws ServletException {
+	public void onStartup(ServletContext servletContext) throws ServletException {
 
 		AnnotationConfigWebApplicationContext appContext = new AnnotationConfigWebApplicationContext();
 		appContext.register(ApplicationContextConfig.class);
 
-		ServletRegistration.Dynamic dispatcher = container.addServlet("SpringDispatcher",
+		ServletRegistration.Dynamic dispatcher = servletContext.addServlet("SpringDispatcher",
 				new DispatcherServlet(appContext));
 		dispatcher.setLoadOnStartup(1);
 		dispatcher.addMapping("/");
