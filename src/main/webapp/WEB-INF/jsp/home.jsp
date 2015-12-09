@@ -5,6 +5,14 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>github brancher</title>
+<script type="text/javascript">
+<%--
+@TODO need to protect context path
+--%>
+var Context = {
+	path : "<%=request.getContextPath()%>"
+};
+</script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/lib/jquery-2.1.4.js">
 </script>
 <script type="text/javascript" src="<%=request.getContextPath()%>/js/page/home.js"></script>
@@ -19,12 +27,11 @@
 			</tr>
 			<tr>
 				<td>
-					<select id="repositoryName" title="Repository" disabled="disabled">
-						<option>Select a Repository</option>
+					<select id="repositoryName" title="Select a Repository" disabled="disabled">
 					</select>
 				</td>
 				<td>
-					<select id="baseBranch" disabled="disabled" title="Base Branch">
+					<select id="baseBranch" disabled="disabled" title="Please Select a Base Branch">
 						<option>Please Select a Base Branch</option>
 					</select>
 				</td>
