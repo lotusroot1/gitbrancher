@@ -1,0 +1,5 @@
+# SAMPLE ONLY
+# This file will contain the properties needed to run the application
+brancher.github.base.url=https://api.github.com
+brancher.github.owner.username=<username owner of repo you wish to create a branch against>
+brancher.github.token=<user_token>

@@ -24,10 +24,12 @@ var Context = {
 				<th>Repository</th>
 				<th>From Branch</th>
 				<th>New Branch</th>
+				<th></th>
 			</tr>
 			<tr>
 				<td>
 					<select id="repositoryName" title="Select a Repository" disabled="disabled">
+						<option selected="selected" value="">Select a repository</option>
 					</select>
 				</td>
 				<td>
@@ -38,21 +40,16 @@ var Context = {
 				<td align="left">
 					<input type="text" id="newBranchName" name="newBranchName" maxlength="100" title="New Branch name" placeholder="Enter branch name" />
 				</td>
-			</tr>
-			<tr>
 				<td colspan="3">
 					<button id="createButton">Create</button>
 				</td>
 			</tr>
 			<tr>
-				<td colspan="3">
-					<div id="result">
-					
-					</div>
+				<td colspan="4">
+					<div id="result"></div>
 				</td>
 			</tr>
 		</table>
-
 	</div>
 </body>
 </html>

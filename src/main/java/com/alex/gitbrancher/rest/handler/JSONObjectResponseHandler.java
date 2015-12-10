@@ -1,29 +1,31 @@
-package com.alex.gitbrancher.helper;
+package com.alex.gitbrancher.rest.handler;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
-public class JSONObjectResponseHandler implements ResponseHandler<JSONObject> {
+public class JSONObjectResponseHandler extends JSONBaseResponseHandler<Map<String, Object>> {
 
 	@Override
-	public JSONObject handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+	public Map<String, Object> handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+		Map<String, Object> map = new HashMap<String, Object>();
 		int status = response.getStatusLine().getStatusCode();
-		JSONObject jsonObject = null;
 		if (status >= 200 && status < 300) {
 			HttpEntity entity = response.getEntity();
 
 			String jsonString = entity != null ? EntityUtils.toString(entity) : null;
-			jsonObject = new JSONObject(jsonString);
+			JSONObject jsonObject = new JSONObject(jsonString);
+
+			map = toMap(jsonObject);
 		} else {
 			throw new ClientProtocolException("Unexpected response status: " + status);
 		}
-		return jsonObject;
+		return map;
 	}
-
 }

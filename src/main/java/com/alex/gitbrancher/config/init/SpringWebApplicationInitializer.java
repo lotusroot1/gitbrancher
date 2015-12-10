@@ -1,4 +1,4 @@
-package com.alex.gitbrancher.config;
+package com.alex.gitbrancher.config.init;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -7,6 +7,8 @@ import javax.servlet.ServletRegistration;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
 import org.springframework.web.servlet.DispatcherServlet;
+
+import com.alex.gitbrancher.config.ApplicationContextConfig;
 
 public class SpringWebApplicationInitializer implements WebApplicationInitializer {
 

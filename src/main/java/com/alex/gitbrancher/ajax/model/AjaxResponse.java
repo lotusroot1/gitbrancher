@@ -1,27 +1,27 @@
-package com.alex.gitbrancher.model.ajax;
+package com.alex.gitbrancher.ajax.model;
 
 public class AjaxResponse {
-	private String status;
+	private AjaxStatus status;
 	private Object result;
 
 	public AjaxResponse() {
-		this(null, null);
+		this(null);
 	}
 
 	public AjaxResponse(Object result) {
-		this(result, "");
+		this(result, AjaxStatus.SUCCESS);
 	}
 
-	public AjaxResponse(Object result, String status) {
+	public AjaxResponse(Object result, AjaxStatus status) {
 		this.result = result;
 		this.status = status;
 	}
 
-	public String getStatus() {
+	public AjaxStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(AjaxStatus status) {
 		this.status = status;
 	}
 
@@ -30,6 +30,7 @@ public class AjaxResponse {
 	}
 
 	public void setResult(Object result) {
+		setStatus(result != null ? AjaxStatus.SUCCESS : AjaxStatus.FAILURE);
 		this.result = result;
 	}
 

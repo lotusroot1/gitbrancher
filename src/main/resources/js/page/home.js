@@ -47,8 +47,8 @@
 	
 	var FormModule = {
 		resetSelect: function(select){
-			select.attr("disabled", true);
 			select.find("option").remove();
+			select.attr("disabled", true);
 		},
 		
 		resetInput: function(input){
@@ -76,7 +76,7 @@
 			});
 		},
 		
-		resetForm: function(){
+		resetForm: function(callback){
 			var baseBranchSelect = $('#baseBranch');
 			baseBranchSelect.attr("disabled", true);
 			
@@ -85,6 +85,12 @@
 				repoSelect.attr("disabled", true);
 				
 				repoSelect.find("option").remove();
+				var defaultOptionText = "Select a repository";
+				repoSelect.append($("<option></option>")
+						.attr("value", "")
+						.attr("selected", "selected")
+						.attr("title", defaultOptionText)
+						.text(defaultOptionText));
 				$.each(data, function(key, value) {
 					repoSelect.append($("<option></option>")
 						.attr("value", value.name)
@@ -93,6 +99,11 @@
 				});
 				
 				repoSelect.attr("disabled", false);
+				
+				$("#result").empty();
+				if($.isFunction(callback)){
+					callback();
+				}
 			});
 		}
 	};
@@ -105,7 +116,10 @@
 			var newBranchName = $("#newBranchName").val();
 			ApiModule.createNewBranch(repositoryName, baseBranchSha, newBranchName, function(data){
 				if(data.status == "SUCCESS"){
-					location.reload();
+					var json = JSON.parse(data.result);
+					FormModule.resetForm(function(){
+						$("#result").append("Branch created [" + json.url + "].");
+					});
 				}
 			});
 		});

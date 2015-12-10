@@ -1,4 +1,4 @@
-package com.alex.gitbrancher.controller;
+package com.alex.gitbrancher.controller.impl;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
