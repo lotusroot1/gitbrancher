@@ -10,10 +10,14 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
-public class JSONObjectResponseHandler extends JSONBaseResponseHandler<Map<String, Object>> {
+import com.alex.gitbrancher.rest.ResponseHandlerResultWrapper;
+
+public class JSONObjectResponseHandler
+		extends JSONBaseResponseHandler<ResponseHandlerResultWrapper<Map<String, Object>>> {
 
 	@Override
-	public Map<String, Object> handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+	public ResponseHandlerResultWrapper<Map<String, Object>> handleResponse(HttpResponse response)
+			throws ClientProtocolException, IOException {
 		Map<String, Object> map = new HashMap<String, Object>();
 		int status = response.getStatusLine().getStatusCode();
 		if (status >= 200 && status < 300) {
@@ -26,6 +30,7 @@ public class JSONObjectResponseHandler extends JSONBaseResponseHandler<Map<Strin
 		} else {
 			throw new ClientProtocolException("Unexpected response status: " + status);
 		}
-		return map;
+
+		return new ResponseHandlerResultWrapper<Map<String, Object>>(map, response);
 	}
 }

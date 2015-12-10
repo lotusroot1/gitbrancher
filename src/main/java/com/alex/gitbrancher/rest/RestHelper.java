@@ -5,7 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
+import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
@@ -36,16 +39,44 @@ public class RestHelper {
 	private String githubToken;
 
 	public List<Object> getArrayRequest(HttpMethod method, String url, Map<String, Object> paramMap) throws Exception {
-		List<Object> response = null;
+		List<Object> result = null;
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
 			HttpRequestBase httpRequest = getHttpRequest(method, url, paramMap);
-			addRequestHeaders(httpRequest);
-			response = httpclient.execute(httpRequest, new JSONArrayResponseHandler());
+			ResponseHandlerResultWrapper<List<Object>> wrapperResponse = httpclient.execute(httpRequest,
+					new JSONArrayResponseHandler());
+			// if response has link header, follow those until we reach the last
+			// page
+			HttpResponse response = wrapperResponse.getResponse();
+			result = wrapperResponse.getResult();
+			/*
+			 * Link:
+			 * <https://api.github.com/repositories/47607232/branches?page=2>;
+			 * rel="next",
+			 * <https://api.github.com/repositories/47607232/branches?page=2>;
+			 * rel="last"
+			 */
+			Header[] linkheaders = response.getHeaders("Link");
+			for (Header header : linkheaders) {
+				String headerLinkValue = header.getValue();
+				String[] headerSubValues = headerLinkValue.split(",");
+				if (ArrayUtils.isNotEmpty(headerSubValues)) {
+					for (String headerSubValue : headerSubValues) {
+						if (headerSubValue.indexOf(";") != -1 && headerSubValue.indexOf("next") != -1) {
+							String[] subValueArray = headerSubValue.split(";");
+							String nextLink = subValueArray[0].trim();
+							nextLink = nextLink.substring(1, nextLink.length() - 1);
+							// System.out.println("Grabbing next page: " +
+							// nextLink);
+							result.addAll(getArrayRequest(method, nextLink, paramMap));
+						}
+					}
+				}
+			}
 		} finally {
 			httpclient.close();
 		}
-		return response;
+		return result;
 	}
 
 	public Map<String, Object> getObjectRequest(HttpMethod method, String url, Map<String, Object> paramMap)
@@ -54,8 +85,10 @@ public class RestHelper {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
 			HttpRequestBase httpRequest = getHttpRequest(method, url, paramMap);
-			addRequestHeaders(httpRequest);
-			response = httpclient.execute(httpRequest, new JSONObjectResponseHandler());
+
+			ResponseHandlerResultWrapper<Map<String, Object>> responseWrapper = httpclient.execute(httpRequest,
+					new JSONObjectResponseHandler());
+			response = responseWrapper.getResult();
 		} finally {
 			httpclient.close();
 		}
@@ -72,7 +105,8 @@ public class RestHelper {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
 			HttpRequestBase httpRequest = getHttpRequest(method, url, paramMap);
-			System.out.println("Executing request " + httpRequest.getRequestLine());
+			// System.out.println("Executing request " +
+			// httpRequest.getRequestLine());
 			responseData = httpclient.execute(httpRequest, new StringOutputResponseHandler());
 			// System.out.println(response);
 		} catch (ClientProtocolException cpe) {

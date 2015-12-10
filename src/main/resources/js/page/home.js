@@ -15,9 +15,12 @@
 		getBranches: function(repository, callback){
 			$.ajax(Context.path + "/search/" + repository + "/branches", {
 				success: function(data, status, jqXHR){
-					var json = JSON.parse(data.result);
+//					var json = JSON.parse(data.result);
+//					if($.isFunction(callback)){
+//						callback(json);
+//					}
 					if($.isFunction(callback)){
-						callback(json);
+						callback(data.result);
 					}
 				}
 			});
@@ -120,6 +123,8 @@
 					FormModule.resetForm(function(){
 						$("#result").append("Branch created [" + json.url + "].");
 					});
+				}else{
+					$("#result").empty().append("Branch creation failed.");
 				}
 			});
 		});

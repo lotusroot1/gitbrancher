@@ -55,11 +55,17 @@ public class AjaxController {
 
 		}
 		AjaxResponse result = new AjaxResponse();
-		RestResponse restResponse = requestHelper.sendRequest(HttpMethod.GET,
-				this.gitBaseUrl + "/repos/" + this.gitUsername + "/" + repository + "/branches");
-		result.setResult(restResponse.getResult());
+		String url = this.gitBaseUrl + "/repos/" + this.gitUsername + "/" + repository + "/branches";
+		// if you change this, please check the js too, "ApiModule.getBranches"
+		boolean useMapResponse = true;
+		if (useMapResponse) {
+			List<Object> restResponse = requestHelper.getArrayRequest(HttpMethod.GET, url, null);
+			result.setResult(restResponse);
+		} else {
+			RestResponse restResponse = requestHelper.sendRequest(HttpMethod.GET, url);
+			result.setResult(restResponse.getResult());
+		}
 		return result;
-
 	}
 
 	@RequestMapping(value = "/create/branch", method = RequestMethod.POST)
@@ -80,20 +86,20 @@ public class AjaxController {
 
 		paramsValid = paramsValid && isValidBranchName(name);
 
+		boolean useMapResponse = false;
 		if (paramsValid) {
 			// /repos/:owner/:repo/git/refs
 			Map<String, Object> paramMap = new HashMap<String, Object>();
 			paramMap.put("sha", sha);
 			paramMap.put("ref", "refs/heads/" + name);
-			// Map<String, Object> jsonResponse =
-			// requestHelper.getObjectRequest(HttpMethod.POST,
-			// this.gitBaseUrl + "/repos/" + this.gitUsername + "/" + repository
-			// + "/git/refs", paramMap);
-			// result.setResult(jsonResponse);
-
-			RestResponse restResponse = requestHelper.sendRequest(HttpMethod.POST,
-					this.gitBaseUrl + "/repos/" + this.gitUsername + "/" + repository + "/git/refs", paramMap);
-			result.setResult(restResponse.getResult());
+			String url = this.gitBaseUrl + "/repos/" + this.gitUsername + "/" + repository + "/git/refs";
+			if (useMapResponse) {
+				Map<String, Object> jsonResponse = requestHelper.getObjectRequest(HttpMethod.POST, url, paramMap);
+				result.setResult(jsonResponse);
+			} else {
+				RestResponse restResponse = requestHelper.sendRequest(HttpMethod.POST, url, paramMap);
+				result.setResult(restResponse.getResult());
+			}
 		} else {
 
 		}

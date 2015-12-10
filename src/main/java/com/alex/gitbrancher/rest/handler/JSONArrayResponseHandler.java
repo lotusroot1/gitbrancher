@@ -10,10 +10,13 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 
-public class JSONArrayResponseHandler extends JSONBaseResponseHandler<List<Object>> {
+import com.alex.gitbrancher.rest.ResponseHandlerResultWrapper;
+
+public class JSONArrayResponseHandler extends JSONBaseResponseHandler<ResponseHandlerResultWrapper<List<Object>>> {
 
 	@Override
-	public List<Object> handleResponse(HttpResponse response) throws ClientProtocolException, IOException {
+	public ResponseHandlerResultWrapper<List<Object>> handleResponse(HttpResponse response)
+			throws ClientProtocolException, IOException {
 		int status = response.getStatusLine().getStatusCode();
 		List<Object> jsonObjs = new ArrayList<Object>();
 		if (status >= 200 && status < 300) {
@@ -31,7 +34,7 @@ public class JSONArrayResponseHandler extends JSONBaseResponseHandler<List<Objec
 		} else {
 			throw new ClientProtocolException("Unexpected response status: " + status);
 		}
-		return jsonObjs;
+		return new ResponseHandlerResultWrapper<List<Object>>(jsonObjs, response);
 	}
 
 }
