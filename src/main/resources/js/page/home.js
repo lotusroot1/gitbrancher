@@ -125,6 +125,9 @@
 					});
 				}else{
 					$("#result").empty().append("Branch creation failed.");
+					if(data.result){
+						$("#result").append(data.result);
+					}
 				}
 			});
 		});

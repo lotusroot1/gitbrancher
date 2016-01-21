@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.alex.gitbrancher.ajax.model.AjaxResponse;
+import com.alex.gitbrancher.ajax.model.AjaxStatus;
 import com.alex.gitbrancher.rest.RestHelper;
 import com.alex.gitbrancher.rest.RestResponse;
 
@@ -101,7 +102,8 @@ public class AjaxController {
 				result.setResult(restResponse.getResult());
 			}
 		} else {
-
+			result.setResult("Bad params!");
+			result.setStatus(AjaxStatus.FAILURE);
 		}
 		return result;
 
