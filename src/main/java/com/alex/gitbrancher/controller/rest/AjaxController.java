@@ -1,6 +1,5 @@
 package com.alex.gitbrancher.controller.rest;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +18,9 @@ import com.alex.gitbrancher.ajax.model.AjaxResponse;
 import com.alex.gitbrancher.ajax.model.AjaxStatus;
 import com.alex.gitbrancher.rest.RestHelper;
 import com.alex.gitbrancher.rest.RestResponse;
+import com.alex.gitbrancher.validator.BrancherValidator;
+import com.alex.gitbrancher.validator.ValidatorResult;
+import com.alex.gitbrancher.validator.create.BrancherValidatorCreate;
 
 @RestController
 public class AjaxController {
@@ -31,13 +33,6 @@ public class AjaxController {
 
 	@Value("${brancher.github.owner.username}")
 	private String gitUsername;
-
-	public static final List<String> reservedBranchNames;
-
-	static {
-		reservedBranchNames = new ArrayList<String>();
-		reservedBranchNames.add("master");
-	}
 
 	@RequestMapping(value = "/search/repos")
 	public AjaxResponse getRepositories() throws Exception {
@@ -75,20 +70,15 @@ public class AjaxController {
 			@RequestParam(name = "name", required = true) String name) throws Exception {
 		AjaxResponse result = new AjaxResponse();
 
-		boolean paramsValid = true;
-		// validate
-		repository = StringUtils.trimToEmpty(repository);
-		name = StringUtils.trimToEmpty(name);
-		sha = StringUtils.trimToEmpty(sha);
-		if (StringUtils.isEmpty(repository) || StringUtils.isEmpty(sha) || StringUtils.isEmpty(name)) {
-			// throw something
-			paramsValid = false;
-		}
-
-		paramsValid = paramsValid && isValidBranchName(name);
+		/**
+		 * @TODO scan and class-load all BrancherValidator implementations, then
+		 *       fire all ValidatorStep.PRE_CREATE validators
+		 */
+		BrancherValidator validator = new BrancherValidatorCreate();
+		ValidatorResult validatorResult = validator.validate(repository, sha, name);
 
 		boolean useMapResponse = false;
-		if (paramsValid) {
+		if (validatorResult.getIsSuccess()) {
 			// /repos/:owner/:repo/git/refs
 			Map<String, Object> paramMap = new HashMap<String, Object>();
 			paramMap.put("sha", sha);
@@ -101,15 +91,23 @@ public class AjaxController {
 				RestResponse restResponse = requestHelper.sendRequest(HttpMethod.POST, url, paramMap);
 				result.setResult(restResponse.getResult());
 			}
+
+			/**
+			 * @TODO scan and class-load all BrancherValidator implementations,
+			 *       then fire all ValidatorStep.POST_CREATE validators
+			 */
 		} else {
-			result.setResult("Bad params!");
+			// don't care about warnings right now
+
+			// display the first error message for now
+			String message = "Generic validator error response.";
+			if (validatorResult.getHasError()) {
+				message = validatorResult.getErrors().get(0).getMessage();
+			}
+			result.setResult(message);
 			result.setStatus(AjaxStatus.FAILURE);
 		}
 		return result;
 
-	}
-
-	public boolean isValidBranchName(String name) {
-		return !reservedBranchNames.contains(name);
 	}
 }
